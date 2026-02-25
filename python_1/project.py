@@ -8,7 +8,7 @@ print("select one from each catergory")
 occasion=input("select occasion( 'Wedding', 'Party', 'Casual':")
 
 #if the user is not selecting the given options in occasion show an error
-while occasion != 'Wedding' and occasion != 'party' and occasion != 'casual':
+if  occasion != 'Wedding' and occasion != 'party' and occasion != 'casual':
     print("Error!! please enter Wedding, Party or Casual")
     occasion=input("Select occasion Wedding, Party or casual: ")
    
@@ -21,18 +21,25 @@ else:
 
  #if the user is not selecting the given option in weather show an error
 
-     while weather != 'hot'and weather !=  'cold'and weather != 'mild' 
-     print("Error!! please enter hot,coldor mild") 
+     if weather != 'hot'and weather !=  'cold'and weather != 'mild':
+      print ("Error!! please enter hot,coldor mild") 
      weather = input("Please enter the weather (Hot, Cold, Mild): ")
 
 #Check the user input
-     different_event = input("Did user enter different event? (Yes/No): ")
+     different_weather = input("Did user enter different weather? (Yes/No): ")
 
      #if the user is selecting NO, proceed to to the next choice
      fabric = input("Please enter the fabric (Cotton, Silk, Jute): ")
 
   #if the user is not selecting the given option in fabric show an error
+if fabric !='cotton' and fabric !='silk'and fabric !='jute':
+ print("Error!! please enter cotton,silk, jute")
 
-while fabric !='cotton' and fabric !='silk'and fabric !='jute'
-print("Error!! please enter cotton,silk, jute")
-fabric = input("Please enter the fabric (Cotton, Silk, Jute): ")
+else:
+    print("Processing information of user selection...")
+    print("Showing suggestions...")
+
+    continue_choice = input("Would you like to continue getting more suggestions? (Yes/No): ")
+
+if continue_choice == "No":
+    print("Thank you. See you next time")
