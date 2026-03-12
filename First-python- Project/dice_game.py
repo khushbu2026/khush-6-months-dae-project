@@ -12,4 +12,3 @@ if 1+3==2:
 print("end of statement")
 
 
-for i in range(10)
