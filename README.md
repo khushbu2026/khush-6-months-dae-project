@@ -35,9 +35,10 @@ Throughout this program, I am continuously expanding my expertise in a variety o
 
 ## My Portfolio
 
-This repository, along with my [GitHub Pages](YOUR_GITHUB_PAGES_LINK_HERE), serves as my primary portfolio, showcasing my capabilities and project work.
+This repository, along with my [GitHub Pages](https://khushbu2026.github.io/khush-6-months-dae-project/), serves as my primary portfolio, showcasing my capabilities and project work.
 
-*   **GitHub Profile**: [github.com/your-github-username](https://github.com/your-github-username)
-*   **LinkedIn Profile**: [linkedin.com/in/your-linkedin-profile](https://www.linkedin.com/in/your-linkedin-profile)
+*   **GitHub Pages**: [khushbu2026.github.io/khush-6-months-dae-project/](https://khushbu2026.github.io/khush-6-months-dae-project/)
+*   **GitHub Profile**: [github.com/khushbu2026](https://github.com/khushbu2026)
+*   **LinkedIn Profile**: [linkedin.com/in/khushbu-jalan-15ab41253/](https://www.linkedin.com/in/khushbu-jalan-15ab41253/)
 
 Feel free to explore my progress and connect with me!

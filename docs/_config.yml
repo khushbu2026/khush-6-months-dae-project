@@ -1,4 +1,7 @@
-title: minimal-theme
+title: Khushu Jalan - My Tech Cohort Portfolio
+description: Documenting my six-month tech cohort journey and showcasing my project portfolio.
+baseurl: "/khush-6-months-dae-project"
+url: "https://khushbu2026.github.io"
 logo: /assets/img/logo.png
 description: Minimal is a theme for GitHub Pages.
 show_downloads: true

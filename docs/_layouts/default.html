@@ -23,6 +23,18 @@
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
+        <nav>
+          <ul>
+            <li><a href="{{ "/" | relative_url }}">Home</a></li>
+            <li><a href="{{ "/about/" | relative_url }}">About Me</a></li>
+            <li><a href="{{ "/resume/" | relative_url }}">Resume</a></li>
+            <li><a href="{{ "/projects/" | relative_url }}">Projects</a></li>
+            <li><a href="{{ "/contact/" | relative_url }}">Contact</a></li>
+            <li><a href="{{ "/github-checklist/" | relative_url }}">GitHub Checklist</a></li>
+          </ul>
+        </nav>
+
+
         {% if site.github.is_project_page %}
         <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
         {% endif %}

@@ -1,123 +1,31 @@
 ---
 layout: default
+title: Home
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+<img src="/assets/img/headshot.jpeg" alt="Khushu Jalan Headshot" width="200" style="border-radius: 50%; display: block; margin: 0 auto 20px;">
 
-[Link to another page](./another-page.html).
+# Welcome to My Portfolio!
 
-There should be whitespace between paragraphs.
+Hello! I'm Khushu Jalan, and this is my digital portfolio showcasing my journey through an intensive six-month tech cohort. This platform is dedicated to documenting my learning, projects, and growth as I transition into the tech industry.
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+## My Journey
 
-# Header 1
+My cohort experience is structured to provide a comprehensive foundation in various tech domains. It started with foundational programming, moved into workforce readiness, and is now progressing into in-depth project development.
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+*   **Semester 1**: Focused on mastering Python programming through practical projects.
+*   **Semester 2**: Centered on workforce readiness, developing professional assets like my GitHub Pages, LinkedIn profile, and resume.
+*   **Semesters 3-5**: Dedicated to building a significant project, applying all the skills learned.
+*   **Semester 6**: Final refinement and completion of my project, preparing for my career.
 
-## Header 2
+This portfolio reflects my dedication to continuous learning and practical application of knowledge. Explore the sections above to learn more about my skills, projects, and professional aspirations.
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+## What You'll Find Here
 
-### Header 3
+*   **About Me**: Learn more about my background, motivations, and career goals.
+*   **Resume**: Access my professional resume detailing my qualifications and experience.
+*   **Projects**: Discover the projects I've worked on, from Python fundamentals to comprehensive web applications.
+*   **Contact**: Get in touch with me through various channels.
+*   **GitHub Checklist**: A page dedicated to mandatory GitHub best practices and configurations.
 
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-#### Header 4
-
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-
-##### Header 5
-
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+Thank you for visiting!
