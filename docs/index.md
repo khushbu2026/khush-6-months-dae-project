@@ -3,7 +3,7 @@ layout: default
 title: Home
 ---
 
-<img src="/assets/img/headshot.jpeg" alt="Khushu Jalan Headshot" width="200" style="border-radius: 50%; display: block; margin: 0 auto 20px;">
+<img src="{{ "/assets/img/headshot.jpeg" | relative_url }}" alt="Khushu Jalan Headshot" width="200" style="border-radius: 50%; display: block; margin: 0 auto 20px;">
 
 # Welcome to My Portfolio!
 
