@@ -3,11 +3,11 @@ layout: default
 title: Home
 ---
 
-<img src="{{ "/assets/img/headshot.jpeg" | relative_url }}" alt="Khushu Jalan Headshot" width="200" style="border-radius: 50%; display: block; margin: 0 auto 20px;">
+<img src="{{ "/assets/img/headshot.jpeg" | relative_url }}" alt="Khushbu Jalan Headshot" width="200" style="border-radius: 50%; display: block; margin: 0 auto 20px;">
 
 # Welcome to My Portfolio!
 
-Hello! I'm Khushu Jalan, and this is my digital portfolio showcasing my journey through an intensive six-month tech cohort. This platform is dedicated to documenting my learning, projects, and growth as I transition into the tech industry.
+Hello! I'm Khushbu Jalan, and this is my digital portfolio showcasing my journey through an intensive six-month tech cohort. This platform is dedicated to documenting my learning, projects, and growth as I transition into the tech industry.
 
 ## My Journey
 

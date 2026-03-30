@@ -3,7 +3,7 @@ layout: default
 title: About Me
 ---
 
-# About Khushu Jalan
+# About Khushbu Jalan
 
 Welcome to my professional journey! I am currently immersed in an intensive six-month tech cohort, a pivotal experience designed to equip me with the skills and knowledge required for a successful career in technology.
 
