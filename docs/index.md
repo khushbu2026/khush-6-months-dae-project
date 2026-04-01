@@ -9,6 +9,8 @@ title: Home
 
 Hello! I'm Khushbu Jalan, and this is my digital portfolio showcasing my journey through an intensive six-month tech cohort. This platform is dedicated to documenting my learning, projects, and growth as I transition into the tech industry.
 
+GRADUATING FROM TECH COHORT- 16TH JULY ,2026
+
 ## My Journey
 
 My cohort experience is structured to provide a comprehensive foundation in various tech domains. It started with foundational programming, moved into workforce readiness, and is now progressing into in-depth project development.
