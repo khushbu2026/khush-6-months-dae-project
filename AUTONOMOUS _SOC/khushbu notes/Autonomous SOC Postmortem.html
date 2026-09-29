@@ -1,0 +1,671 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>Autonomous SOC Postmortem</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F3F5F7;
+    --surface:#FFFFFF;
+    --surface-2:#EAEFF2;
+    --ink:#161B22;
+    --ink-soft:#57616D;
+    --ink-faint:#8894A0;
+    --line:#DEE3E8;
+    --accent:#0E7490;
+    --accent-ink:#075466;
+    --accent-soft:#E3F1F4;
+    --ok:#1E8A5F;
+    --ok-soft:#E4F5EC;
+    --warn:#B36B00;
+    --warn-soft:#FBF0DE;
+    --crit:#B23B2E;
+    --crit-soft:#FBEAE8;
+    --shadow: 0 1px 2px rgba(22,27,34,0.04), 0 8px 24px rgba(22,27,34,0.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1319;
+      --surface:#171E27;
+      --surface-2:#1D2631;
+      --ink:#DDE4EB;
+      --ink-soft:#93A1B0;
+      --ink-faint:#5E6B7A;
+      --line:#2A333F;
+      --accent:#5FC9DE;
+      --accent-ink:#8FDCEC;
+      --accent-soft:#173039;
+      --ok:#52C093;
+      --ok-soft:#122A22;
+      --warn:#E0A23D;
+      --warn-soft:#2E2210;
+      --crit:#E3766A;
+      --crit-soft:#2E1917;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1319;
+    --surface:#171E27;
+    --surface-2:#1D2631;
+    --ink:#DDE4EB;
+    --ink-soft:#93A1B0;
+    --ink-faint:#5E6B7A;
+    --line:#2A333F;
+    --accent:#5FC9DE;
+    --accent-ink:#8FDCEC;
+    --accent-soft:#173039;
+    --ok:#52C093;
+    --ok-soft:#122A22;
+    --warn:#E0A23D;
+    --warn-soft:#2E2210;
+    --crit:#E3766A;
+    --crit-soft:#2E1917;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Public Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size:16.5px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+  a{ color:var(--accent-ink); text-decoration-color: color-mix(in srgb, var(--accent-ink) 40%, transparent); text-underline-offset:2px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
+
+  .wrap{ max-width:840px; margin:0 auto; padding: 56px 24px 120px; }
+
+  .eyebrow{
+    font-family:"Martian Mono", monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+  }
+
+  header.masthead{ padding-bottom:40px; border-bottom:1px solid var(--line); margin-bottom:44px; }
+  header.masthead .eyebrow{ display:block; margin-bottom:16px; }
+  h1{
+    font-family:"Martian Mono", monospace;
+    font-weight:700;
+    font-size:clamp(2rem, 4.4vw, 2.7rem);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 18px;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .dek{ font-size:1.1rem; color:var(--ink-soft); max-width:62ch; margin:0 0 24px; }
+  .howto{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .howto .mark{ font-family:"Martian Mono",monospace; font-weight:700; color:var(--accent); font-size:0.8rem; padding-top:2px; }
+  .howto p{ margin:0; font-size:0.94rem; color:var(--ink-soft); }
+  .howto strong{ color:var(--ink); font-weight:600; }
+
+  h2.section-title{
+    font-family:"Martian Mono", monospace;
+    font-weight:700;
+    font-size:1.5rem;
+    letter-spacing:-0.005em;
+    margin: 64px 0 6px;
+    color:var(--ink);
+  }
+  .section-sub{ color:var(--ink-soft); font-size:0.95rem; margin:0 0 24px; max-width:62ch; }
+
+  /* quick reference table */
+  .ref-table{ width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
+  .ref-table thead th{
+    text-align:left; font-family:"Martian Mono",monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--ink-faint); font-weight:600; padding:12px 16px; border-bottom:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  .ref-table td{ padding:12px 16px; border-bottom:1px solid var(--line); font-size:0.92rem; vertical-align:middle; }
+  .ref-table tr:last-child td{ border-bottom:none; }
+  .ref-table tr:hover td{ background: color-mix(in srgb, var(--accent-soft) 40%, transparent); }
+  .ref-num{ font-family:"JetBrains Mono",monospace; color:var(--ink-faint); font-size:0.85rem; }
+  .ref-table a{ color:var(--ink); font-weight:600; text-decoration:none; }
+  .ref-table a:hover{ color:var(--accent-ink); }
+  .layer-tag{ font-family:"JetBrains Mono",monospace; font-size:0.78rem; color:var(--ink-soft); }
+  .table-scroll{ overflow-x:auto; border-radius:12px; }
+
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; font-family:"Martian Mono",monospace;
+    font-size:10px; letter-spacing:0.06em; text-transform:uppercase; font-weight:600;
+    padding:4px 9px; border-radius:99px; white-space:nowrap;
+  }
+  .chip::before{ content:""; width:6px; height:6px; border-radius:99px; background:currentColor; }
+  .chip.ok{ background:var(--ok-soft); color:var(--ok); }
+  .chip.warn{ background:var(--warn-soft); color:var(--warn); }
+  .chip.avoided{ background:var(--accent-soft); color:var(--accent-ink); }
+
+  /* architecture diagram */
+  figure.diagram{ margin: 20px 0 8px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 16px 14px; box-shadow:var(--shadow); }
+  figure.diagram .table-scroll{ overflow-x:auto; }
+  figure.diagram svg{ display:block; width:100%; height:auto; min-width:640px; }
+  figcaption{ font-size:0.85rem; color:var(--ink-soft); margin-top:12px; padding:0 6px; }
+  figcaption code{ font-size:0.82rem; }
+
+  /* issue cards */
+  .issue{ margin-top:56px; padding-top:8px; scroll-margin-top:24px; }
+  .issue-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:10px; }
+  .issue-head .eyebrow{ margin:0; }
+  h3.issue-title{ font-family:"Public Sans",sans-serif; font-weight:700; font-size:1.32rem; margin:4px 0 18px; color:var(--ink); text-wrap:balance; }
+
+  blockquote.err{
+    margin: 0 0 22px; padding:14px 16px; background:var(--surface-2); border:1px solid var(--line); border-left:3px solid var(--crit);
+    border-radius:8px; overflow-x:auto;
+  }
+  blockquote.err pre{ margin:0; font-family:"JetBrains Mono",monospace; font-size:0.83rem; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+
+  .frame{ margin: 0 0 18px; }
+  .frame .label{
+    font-family:"Martian Mono",monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    font-weight:700; color:var(--ink-faint); margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  }
+  .frame .label::before{ content:""; width:14px; height:2px; background:var(--line); }
+  .frame p{ margin:0; max-width:66ch; }
+  .frame p + p{ margin-top:10px; }
+  .frame code{ font-family:"JetBrains Mono",monospace; font-size:0.86em; background:var(--surface-2); padding:0.1em 0.35em; border-radius:4px; border:1px solid var(--line); }
+
+  .frame.fix .label::before{ background:var(--ok); }
+  .frame.next .label::before{ background:var(--accent); }
+
+  /* glossary */
+  .glossary{ display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow); }
+  .g-row{ display:grid; grid-template-columns: 200px 1fr; gap:18px; padding:16px 18px; border-bottom:1px solid var(--line); }
+  .g-row:last-child{ border-bottom:none; }
+  .g-term{ font-family:"Martian Mono",monospace; font-weight:700; font-size:0.86rem; color:var(--accent-ink); padding-top:1px; }
+  .g-def p{ margin:0 0 6px; font-size:0.92rem; }
+  .g-def .tech{ color:var(--ink-soft); font-size:0.87rem; }
+  .g-def .tech::before{ content:"→ "; color:var(--ink-faint); }
+  @media (max-width:640px){ .g-row{ grid-template-columns:1fr; gap:6px; } }
+
+  /* known gaps */
+  .gaps{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .gaps li{
+    display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1px solid var(--line);
+    border-radius:10px; padding:13px 16px; box-shadow:var(--shadow); font-size:0.93rem;
+  }
+  .gaps li::before{ content:"○"; color:var(--warn); font-size:0.8rem; padding-top:3px; font-family:"JetBrains Mono",monospace; }
+  .gaps strong{ font-weight:600; }
+
+  footer{ margin-top:80px; padding-top:24px; border-top:1px solid var(--line); color:var(--ink-faint); font-size:0.82rem; }
+
+  @media (prefers-reduced-motion: reduce){ *{ scroll-behavior:auto !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="eyebrow">Autonomous SOC · Live-deployment session</span>
+    <h1>Setup Postmortem</h1>
+    <p class="dek">Twelve things broke, in order, while wiring Claude Desktop → n8n → Wazuh into a working automated-response pipeline. Each one is documented here at two depths — plain English first, then the mechanism underneath — so the fix makes sense on its own, not just as a thing that happened once.</p>
+    <div class="howto">
+      <span class="mark">→</span>
+      <p><strong>How to use this:</strong> skim the reference table for the shape of what happened, then read entries in order — several build on each other (the tunnel work in #3–4 turned out to be a detour; the real fix in #6–8 didn't need it). Every "self-diagnose" line is written to be useful on a <em>different</em> problem that just smells the same.</p>
+    </div>
+  </header>
+
+  <h2 class="section-title">At a glance</h2>
+  <p class="section-sub">Twelve issues, in the order they happened. Click any row to jump to the full writeup.</p>
+  <div class="table-scroll">
+  <table class="ref-table">
+    <thead>
+      <tr><th style="width:36px">#</th><th>Issue</th><th>Layer</th><th style="width:110px">Outcome</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ref-num">01</td><td><a href="#issue-1">Claude Desktop's connector required HTTPS; n8n only offered HTTP</a></td><td class="layer-tag">Claude Desktop</td><td><span class="chip warn">Sidestepped</span></td></tr>
+      <tr><td class="ref-num">02</td><td><a href="#issue-2">Homebrew directories not writable</a></td><td class="layer-tag">macOS / Homebrew</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">03</td><td><a href="#issue-3">Containers couldn't reach "localhost" on the Mac</a></td><td class="layer-tag">Docker networking</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">04</td><td><a href="#issue-4">Free tunnel URL changed on every restart</a></td><td class="layer-tag">Cloudflare / ngrok</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">05</td><td><a href="#issue-5">n8n's OAuth sign-in service failed to register</a></td><td class="layer-tag">n8n · MCP auth</td><td><span class="chip warn">Abandoned path</span></td></tr>
+      <tr><td class="ref-num">06</td><td><a href="#issue-6">First config fix also failed — unsupported schema</a></td><td class="layer-tag">Claude Desktop config</td><td><span class="chip warn">Abandoned path</span></td></tr>
+      <tr><td class="ref-num">07</td><td><a href="#issue-7">Node.js wasn't installed</a></td><td class="layer-tag">macOS / Node</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">08</td><td><a href="#issue-8">mcp-remote's header-parsing bug</a></td><td class="layer-tag">mcp-remote</td><td><span class="chip avoided">Avoided</span></td></tr>
+      <tr><td class="ref-num">09</td><td><a href="#issue-9"><code>git add .</code> nearly staged the whole Mac</a></td><td class="layer-tag">git</td><td><span class="chip avoided">Caught in time</span></td></tr>
+      <tr><td class="ref-num">10</td><td><a href="#issue-10">Wrong Wazuh account → 401 on the Manager API</a></td><td class="layer-tag">Wazuh</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">11</td><td><a href="#issue-11">n8n credential import missing required ID</a></td><td class="layer-tag">n8n CLI</td><td><span class="chip ok">Resolved</span></td></tr>
+      <tr><td class="ref-num">12</td><td><a href="#issue-12">n8n's own CLI conflicted with the running server</a></td><td class="layer-tag">n8n CLI</td><td><span class="chip warn">Worked around</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 class="section-title">How it's wired, end to end</h2>
+  <p class="section-sub">The system these fixes converge on. n8n and both Wazuh services are separate Docker containers on the same Mac — the <code style="font-family:'JetBrains Mono',monospace;background:var(--surface-2);padding:0.1em 0.4em;border-radius:4px;border:1px solid var(--line)">host.docker.internal</code> hop from Issue 3 is why n8n can reach them at all.</p>
+  <figure class="diagram">
+    <div class="table-scroll">
+    <svg viewBox="0 0 1180 470" role="img" aria-label="Claude Desktop spawns mcp-remote as a local process, which connects over HTTP with a bearer token to n8n running in Docker. n8n authenticates with separate credentials to the Wazuh Indexer and Wazuh Manager API, also in Docker, reaching both via host.docker.internal. The Wazuh Manager issues an Active Response command to the Windows honeypot agent, which sits outside Docker.">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g fill="none" stroke="currentColor" opacity="0.9">
+        <rect x="24" y="16" width="700" height="438" rx="14" stroke-dasharray="4 5" opacity="0.5"/>
+      </g>
+      <text x="44" y="42" font-family="Martian Mono, monospace" font-size="11" letter-spacing="0.08em" fill="currentColor" opacity="0.55">DOCKER DESKTOP</text>
+
+      <!-- Claude Desktop -->
+      <rect x="480" y="180" width="180" height="72" rx="10" fill="none" stroke="currentColor"/>
+      <text x="570" y="211" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">Claude Desktop</text>
+      <text x="570" y="230" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">local app</text>
+
+      <!-- mcp-remote -->
+      <rect x="230" y="180" width="180" height="72" rx="10" fill="none" stroke="currentColor"/>
+      <text x="320" y="211" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">mcp-remote</text>
+      <text x="320" y="230" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">local process, stdio↔HTTP</text>
+
+      <line x1="480" y1="216" x2="416" y2="216" stroke="currentColor" marker-end="url(#arrow)"/>
+      <text x="448" y="200" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">spawns (stdio)</text>
+
+      <!-- n8n -->
+      <rect x="44" y="180" width="150" height="72" rx="10" fill="none" stroke="currentColor"/>
+      <text x="119" y="211" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">n8n</text>
+      <text x="119" y="230" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">:5678</text>
+
+      <line x1="230" y1="216" x2="200" y2="216" stroke="currentColor" marker-end="url(#arrow)"/>
+      <text x="215" y="167" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">HTTP +</text>
+      <text x="215" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">Bearer token</text>
+
+      <!-- Wazuh Indexer -->
+      <rect x="44" y="60" width="220" height="70" rx="10" fill="none" stroke="currentColor"/>
+      <text x="154" y="90" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">Wazuh Indexer</text>
+      <text x="154" y="108" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">:9200 · OpenSearch</text>
+
+      <line x1="119" y1="180" x2="145" y2="130" stroke="currentColor" marker-end="url(#arrow)"/>
+      <text x="220" y="152" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">Basic Auth (admin)</text>
+      <text x="220" y="164" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">query alerts</text>
+
+      <!-- Wazuh Manager -->
+      <rect x="44" y="330" width="220" height="70" rx="10" fill="none" stroke="currentColor"/>
+      <text x="154" y="360" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">Wazuh Manager</text>
+      <text x="154" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.6">:55000 · REST API</text>
+
+      <line x1="119" y1="252" x2="145" y2="330" stroke="currentColor" marker-end="url(#arrow)"/>
+      <text x="222" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">Basic Auth (wazuh-wui)</text>
+      <text x="222" y="312" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.7">→ JWT → PUT active-response</text>
+
+      <!-- Agent -->
+      <rect x="900" y="330" width="240" height="76" rx="10" fill="none" stroke="var(--crit)"/>
+      <text x="1020" y="360" text-anchor="middle" font-family="Public Sans, sans-serif" font-size="13.5" font-weight="700" fill="currentColor">Windows Honeypot</text>
+      <text x="1020" y="378" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">agent WIN-KU9NOAE1FE4</text>
+      <text x="1020" y="393" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="currentColor" opacity="0.5">outside Docker</text>
+
+      <line x1="264" y1="365" x2="896" y2="365" stroke="var(--crit)" marker-end="url(#arrow)"/>
+      <text x="580" y="352" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9.5" fill="var(--crit)">Active Response: firewall-drop0(source_ip)</text>
+    </svg>
+    </div>
+    <figcaption>Final wiring: <strong>Claude Desktop</strong> spawns <code>mcp-remote</code> as a local child process (a workaround for Issue 6); it opens an HTTP connection to n8n carrying the bearer token from Issue 5's abandoned OAuth path. n8n reaches both Wazuh containers over <code>host.docker.internal</code> (Issue 3), using two <em>separate</em> credential sets (Issue 10). The only edge that actually reaches outside Docker is the real one — Wazuh's own Active Response call to the honeypot agent.</figcaption>
+  </figure>
+
+  <h2 class="section-title">The log</h2>
+  <p class="section-sub">Full detail on each of the twelve, in the order they happened.</p>
+
+  <section class="issue" id="issue-1">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 01 · Claude Desktop</span>
+      <span class="chip warn">Sidestepped</span>
+    </div>
+    <h3 class="issue-title">The core constraint — Claude Desktop needs HTTPS, n8n only gives HTTP</h3>
+    <p style="color:var(--ink-soft);margin:-8px 0 18px">n8n's MCP address is <code>http://localhost:5678/mcp-server/http</code>. Claude Desktop's "Add custom connector" screen only accepts <code>https://</code> URLs.</p>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>Claude Desktop's point-and-click connector form has a rule: the address has to start with the secure <code>https://</code>, not plain <code>http://</code>. n8n, running locally, only speaks plain <code>http://</code> out of the box — two systems with a mismatched requirement.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>This restriction lives specifically in Claude Desktop's OAuth-capable "remote connector" GUI, which assumes a publicly reachable, TLS-terminated endpoint — OAuth redirects and dynamic client registration are built for the public web. It is <em>not</em> a restriction on Claude Desktop's underlying MCP client in general, only on that one GUI flow.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>We ultimately bypassed this constraint entirely (see Issue 6) by using Claude Desktop's config-file server format instead of the GUI connector — it talks to <code>http://localhost</code> directly, no HTTPS required at all. The tunnel work below turned out to be unnecessary for the final solution.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If a GUI only accepts <code>https://</code> for something running on your own machine, check for a config-file / CLI path that skips that GUI before building tunnel infrastructure.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-2">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 02 · macOS / Homebrew</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">Homebrew was broken — permissions</h3>
+    <blockquote class="err"><pre>Error: The following directories are not writable by your user:
+  /opt/homebrew /opt/homebrew/Cellar /opt/homebrew/Frameworks ...</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p><code>brew install</code> needs to write files into a shared system folder, and this Mac user account wasn't allowed to write there anymore.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>Homebrew's <code>/opt/homebrew</code> prefix is normally owned by the installing user. Ownership had drifted — commonly caused by a prior <code>sudo brew …</code> call — so the directories were no longer writable by the current user. Homebrew's own suggested fix is <code>sudo chown -R $(whoami) /opt/homebrew …</code>.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>We didn't run the suggested <code>chown</code> — unnecessary system-wide ownership changes weren't worth it for one tool. Docker Desktop was already running, so <code>cloudflared</code> (and later <code>ngrok</code>) ran as Docker containers instead. Same result, zero permission changes.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If <code>brew install</code> fails on permissions and you don't want to touch system ownership, check for an official Docker image of the tool first.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-3">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 03 · Docker networking</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">Containers couldn't reach "localhost" on the Mac</h3>
+    <p style="color:var(--ink-soft);margin:-8px 0 18px">Pointing <code>cloudflared</code>/<code>ngrok</code> at <code>http://localhost:5678</code> failed — they needed <code>http://host.docker.internal:5678</code> instead.</p>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>Inside a Docker container, "localhost" means <em>the container itself</em>, not your Mac. Containers are like separate little computers — "localhost" inside one doesn't reach anything on your Mac or in a sibling container. Docker Desktop provides a special hostname, <code>host.docker.internal</code>, that means "the actual Mac this is running on."</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>Each container gets its own network namespace; <code>localhost</code>/<code>127.0.0.1</code> inside one resolves to that container's own loopback interface. Docker Desktop for Mac injects a DNS entry, <code>host.docker.internal</code>, resolving to the host — letting a container reach services published on the host or in sibling containers via their host-published ports.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Every container that needed to reach n8n (<code>cloudflared</code>, <code>ngrok</code>), or that n8n needed to reach (Wazuh Indexer, Wazuh Manager API), used <code>host.docker.internal</code> instead of <code>localhost</code>.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If one container needs to talk to something on the host or in another container and <code>localhost</code> gives connection refused, try <code>host.docker.internal</code> first.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-4">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 04 · Cloudflare / ngrok</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">Free tunnel URLs aren't stable</h3>
+    <p style="color:var(--ink-soft);margin:-8px 0 18px">A Cloudflare "quick tunnel" gives a working HTTPS URL immediately, but the subdomain regenerates randomly every restart — no way to pin it without owning a domain.</p>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>The free instant tunnel is like a temporary phone number — great for a quick call, useless if people need to reach the same number tomorrow.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>Cloudflare "quick tunnels" (<code>cloudflared tunnel --url …</code> with no named tunnel) are anonymous and ephemeral by design — Cloudflare won't let you reserve a fixed hostname without owning a zone (domain) in your account, since the hostname is a DNS record under that zone. A <em>named</em> tunnel needs that domain. ngrok, by contrast, offers one free <em>static</em> domain per account with no domain-ownership requirement.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Moved from Cloudflare's quick tunnel to ngrok, reserving a permanent free subdomain tied to the ngrok account instead of a domain that would need to be owned outright.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If a tunnel URL needs to stay fixed, check whether the tool requires domain ownership (Cloudflare named tunnels do) before starting — ngrok's free static domain is the lower-friction option without one.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-5">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 05 · n8n · MCP auth</span>
+      <span class="chip warn">Abandoned path</span>
+    </div>
+    <h3 class="issue-title">n8n's OAuth "sign-in service" failed to register Claude Desktop</h3>
+    <blockquote class="err"><pre>Couldn't register with n8n's sign-in service. You can try again, or add
+an OAuth Client ID in the connector settings.
+Reference: "ofid_e916c1f7e2f08f19"</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>n8n offered to let Claude Desktop log in automatically — like "Sign in with Google" — but the handshake that sets that up failed on n8n's side.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>n8n's "Instance-level MCP" preview feature can require OAuth 2.1, including <strong>Dynamic Client Registration</strong> (RFC 7591) — the connecting client registers itself with the server's OAuth endpoint at connection time, with no pre-shared app credentials. This flow is primarily built and tested for n8n's own hosted cloud OAuth service; on a self-hosted instance, that registration step doesn't reliably complete.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Abandoned the OAuth path entirely. Switched n8n's MCP auth to <strong>Access Token</strong> mode — a static bearer token — then connected Claude Desktop using that token through a different mechanism (Issues 6–7) instead of the GUI's OAuth flow.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If a self-hosted tool's OAuth "auto sign-in" fails with a registration error, check for a plain static API-token mode as an alternative — self-hosted OAuth servers are often less reliable here than a hosted SaaS equivalent.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-6">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 06 · Claude Desktop config</span>
+      <span class="chip warn">Abandoned path</span>
+    </div>
+    <h3 class="issue-title">First fix attempt also failed — unsupported config schema</h3>
+    <blockquote class="err"><pre>Some MCP servers couldn't be loaded.
+The following entries in claude_desktop_config.json are not valid MCP
+server configurations and were skipped: n8n-mcp</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>We tried editing Claude Desktop's settings file directly, using a newer format, to add the server with the access token. That Claude Desktop build didn't recognize the format and silently skipped the entry.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>The first attempt used <code>{"type": "http", "url": "...", "headers": {...}}</code> — a newer addition to the config schema for remote HTTP servers with custom headers, not yet rolled out to every build. The older, universally-supported schema is <code>{"command": "...", "args": [...], "env": {...}}</code> — a local process Claude Desktop spawns and talks to over stdio.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Switched to the older <code>command</code>/<code>args</code>/<code>env</code> format, using a bridge tool (<code>mcp-remote</code>, Issue 7) that runs as a local process and internally makes the HTTP call with the Authorization header — Claude Desktop never has to understand <code>"type": "http"</code> at all.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If Claude Desktop silently skips an MCP entry with a "not valid configuration" popup, suspect a schema-version mismatch — check your build against the docs, or fall back to <code>command</code>/<code>args</code>/<code>env</code>, the most universally supported format.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-7">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 07 · macOS / Node</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">The real fix needed Node.js, and it wasn't installed</h3>
+    <blockquote class="err"><pre>/bin/bash: node: command not found
+/bin/bash: npx: command not found</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>The bridge tool that finally worked (<code>mcp-remote</code>) is a small JavaScript program. Running any JavaScript program from the command line needs Node.js first, and this Mac didn't have it yet.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p><code>npx</code> is Node's package runner — it downloads and runs an npm package on demand, but ships as part of Node itself, so Node has to exist first. <code>mcp-remote</code> is a small stdio↔HTTP proxy: Claude Desktop spawns it as a normal local process, satisfying Issue 6's schema requirement, and internally it opens an HTTP connection to n8n carrying whatever headers it's given (here, <code>Authorization: Bearer &lt;token&gt;</code>).</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Installed Node via <code>nvm</code> (no <code>sudo</code>/Homebrew needed) as a first pass; a system-wide install via the official installer (<code>/usr/local/bin/node</code>) followed separately and is what the final config points at — a more stable path than an nvm version-numbered one. Verified it worked by running <code>mcp-remote</code> manually for a few seconds and confirming <code>Connected to remote server using StreamableHTTPClientTransport</code> in its log, before wiring it into the real config — catching any auth/URL problems before burning a Claude Desktop restart cycle.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p><code>command not found</code> for <code>node</code>/<code>npx</code> always means Node isn't installed, or isn't on the <code>PATH</code> whatever's calling it uses. Check with <code>which node</code>.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-8">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 08 · mcp-remote</span>
+      <span class="chip avoided">Avoided</span>
+    </div>
+    <h3 class="issue-title">A silent trap in mcp-remote's header syntax</h3>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>There's a known bug where, on some platforms, an auth header value with a space in it (like <code>Bearer abc123</code>) can get mangled when passed as a command-line argument, silently breaking the header. This one was sidestepped before it ever caused a problem.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>Cursor, Codex-CLI, and Claude Desktop (Windows) have a documented bug where spaces inside a spawned process's arguments aren't escaped correctly when the parent invokes <code>npx</code>. The workaround: keep the <code>--header</code> argument itself space-free (<code>Authorization:${VAR}</code>, no space around the colon) and put the actual value — which does contain a space — into an <strong>environment variable</strong> referenced by <code>${VAR}</code>, since env vars aren't subject to the same mangling.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Written this way from the start: <code>"--header", "Authorization:${N8N_MCP_AUTH}"</code> with <code>"env": {"N8N_MCP_AUTH": "Bearer &lt;token&gt;"}</code>, rather than embedding the full header inline.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If a bearer-token header mysteriously fails when passed as a CLI argument but works fine via <code>curl</code>, suspect argument-space-mangling — move the value into an environment variable.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-9">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 09 · git</span>
+      <span class="chip avoided">Caught in time</span>
+    </div>
+    <h3 class="issue-title"><code>git add .</code> nearly staged your entire Mac</h3>
+    <p style="color:var(--ink-soft);margin:-8px 0 18px"><code>git status</code> revealed <code>/Users/Adult</code> itself is a git repo. A plain <code>git add .</code> there would have staged everything: shell history, <code>.claude.json</code> (session/credential data), <code>.docker/</code>, <code>.npm/</code>, all of <code>Library/</code>, <code>Documents/</code>, <code>Downloads/</code> — and the n8n access token just written into <code>claude_desktop_config.json</code>.</p>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>The whole user folder, not just a project folder, turned out to be tracked by git. Typing the everyday shortcut "stage everything" there would have swept shell history and saved secrets right along with any real project files.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p><code>git add .</code> stages every changed/untracked file under the current directory recursively, filtered only by <code>.gitignore</code>. Since the repo root was <code>/Users/Adult</code>, "current directory" was the entire home folder. <code>git status --porcelain</code> was run first, specifically to enumerate what would be staged before running any add.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>The command was never run. The full file list was surfaced instead, and the task paused for clarification — it turned out the ask had moved to a different task, so nothing was ever staged.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>Before any <code>git add -A</code> or <code>git add .</code>, run <code>git rev-parse --show-toplevel</code> to confirm the repo root is what you think it is, and <code>git status</code> to see what's actually about to be staged — especially in a directory you didn't set up yourself.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-10">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 10 · Wazuh</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">Wrong Wazuh account used — 401 Unauthorized on the Manager API</h3>
+    <blockquote class="err"><pre>Indexer (:9200) with admin/SecretPassword → works.
+Manager API (:55000) with admin/SecretPassword →
+{"title":"Unauthorized","detail":"Invalid credentials"}</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>Wazuh isn't one login for everything — the dashboard/search side and the "management" side use two completely separate accounts. The assumption that they matched was wrong.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p>A Wazuh deployment has at least two distinct auth surfaces: the <strong>Wazuh Indexer</strong> (an OpenSearch fork, port 9200, secured by OpenSearch Security with its own <code>admin</code> user) and the <strong>Wazuh Manager REST API</strong> (port 55000, secured by its own RBAC system with a separate service account — commonly <code>wazuh-wui</code>, with an auto-generated password). Both use HTTP Basic Auth and look similar, but are unrelated credential stores. The correct password was found by reading the Wazuh Manager container's environment variables (<code>API_USERNAME</code>, <code>API_PASSWORD</code>), set at deploy time.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Located the actual <code>API_USERNAME=wazuh-wui</code> / <code>API_PASSWORD=…</code> pair from the manager container's environment, and confirmed it with a direct <code>curl -X POST https://localhost:55000/security/user/authenticate</code> test before wiring it into n8n as a credential separate from the Indexer's.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>If Wazuh Indexer (9200) accepts your admin login but the Manager API (55000) rejects the same login, don't assume it's one account — check the manager container's env (<code>API_USERNAME</code>/<code>API_PASSWORD</code>) or your deployment's <code>.env</code>/compose file for a separate API service account.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-11">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 11 · n8n CLI</span>
+      <span class="chip ok">Resolved</span>
+    </div>
+    <h3 class="issue-title">n8n credential import failed on a missing ID field</h3>
+    <blockquote class="err"><pre>SQLITE_CONSTRAINT: NOT NULL constraint failed: credentials_entity.id</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>We tried to create a login entry in n8n by feeding it a file directly instead of using the web form, and n8n's database rejected it because we hadn't given it a required internal ID.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p><code>n8n import:credentials</code> writes rows directly into n8n's database (SQLite here). Creating a credential via the web UI auto-generates a unique <code>id</code>; the CLI importer does not — it expects the JSON to already include one, and SQLite's <code>NOT NULL</code> constraint on that column rejects the insert otherwise.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Generated random 16-character alphanumeric IDs, matching n8n's own style, and included them explicitly in the credential JSON before importing — the second attempt succeeded.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p>A <code>NOT NULL constraint failed</code> on an <code>id</code> column from a CLI import tool almost always means: include an explicit unique ID in the record — the CLI skips whatever auto-generation the GUI does for you.</p>
+    </div>
+  </section>
+
+  <section class="issue" id="issue-12">
+    <div class="issue-head">
+      <span class="eyebrow">Issue 12 · n8n CLI</span>
+      <span class="chip warn">Worked around</span>
+    </div>
+    <h3 class="issue-title">n8n's own CLI test-runner conflicted with the running server</h3>
+    <blockquote class="err"><pre>n8n Task Broker's port 5679 is already in use.
+Do you have another instance of n8n running already?</pre></blockquote>
+    <div class="frame">
+      <div class="label">Plain English</div>
+      <p>We tried to test-run a workflow from the command line, inside the same container where n8n was already running as a live server — and the test command tried to start its own helper process on a port the live server already held.</p>
+    </div>
+    <div class="frame">
+      <div class="label">Technical</div>
+      <p><code>n8n execute --id=…</code> spins up n8n's <strong>Task Broker</strong> — an internal component for scaling task execution — on a fixed local port (5679) as part of a one-off CLI run. The container's main <code>n8n start</code> process was already holding that port, so the second process couldn't bind it and failed immediately.</p>
+    </div>
+    <div class="frame fix">
+      <div class="label">How it was resolved</div>
+      <p>Abandoned CLI-based execution for this container and tested through the n8n web UI instead — which is why a temporary manual-trigger test branch (a harmless fake IP and a non-existent agent ID) was added directly to the workflow, safely testable by clicking "Execute" in the browser.</p>
+    </div>
+    <div class="frame next">
+      <div class="label">Self-diagnose next time</div>
+      <p><code>n8n execute</code> and a running <code>n8n start</code> server can't share one container. To test a workflow ad hoc, use the web UI's Execute button, or run the CLI in a separate n8n instance that isn't also running the server.</p>
+    </div>
+  </section>
+
+  <h2 class="section-title">Glossary</h2>
+  <p class="section-sub">The recurring concepts, so you're not re-deriving them from context every time.</p>
+  <div class="glossary">
+    <div class="g-row">
+      <div class="g-term">MCP</div>
+      <div class="g-def"><p>The "language" Claude uses to call out to external tools, like n8n's workflows.</p><p class="tech">Model Context Protocol — a standard for exposing tools/resources to an LLM client over stdio or HTTP.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">stdio vs. HTTP transport</div>
+      <div class="g-def"><p>stdio = a program running right next to Claude it talks to directly. HTTP = a separate server elsewhere Claude talks to over the network.</p><p class="tech">stdio: parent spawns a child, communicates over stdin/stdout. HTTP: client makes network requests to a URL. <code>mcp-remote</code> bridges the two.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">host.docker.internal</div>
+      <div class="g-def"><p>The special address a container uses to mean "the Mac it's running on."</p><p class="tech">A DNS name Docker Desktop resolves to the host's (or bridge gateway's) address, for container→host/sibling-container traffic.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">OAuth 2.1 / Dynamic Client Registration</div>
+      <div class="g-def"><p>"Sign in automatically" — but for two programs to do that safely, one first has to formally register itself with the other.</p><p class="tech">RFC 7591: a client registers itself with an authorization server at connection time, no pre-shared app ID needed.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">Bearer token</div>
+      <div class="g-def"><p>A password-like secret string attached to a request to prove who you are — a wristband at an event.</p><p class="tech">A credential sent in the <code>Authorization: Bearer &lt;token&gt;</code> header; the server trusts whoever holds a valid token.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">Wazuh Indexer vs. Manager API</div>
+      <div class="g-def"><p>Two different "departments" inside Wazuh with separate logins — one stores/searches alert data, the other lets you control the system.</p><p class="tech">Indexer (:9200): OpenSearch-based storage/search layer. Manager API (:55000): RBAC-secured REST control-plane, used here to trigger Active Response.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">Active Response</div>
+      <div class="g-def"><p>Wazuh's built-in "take action automatically" feature — e.g. blocking an IP at the firewall on the affected machine.</p><p class="tech">A Manager API call (<code>PUT /active-response</code>) instructing a specific registered agent to run a predefined response script (here, <code>firewall-drop0</code>) against a target.</p></div>
+    </div>
+    <div class="g-row">
+      <div class="g-term">n8n Data Table</div>
+      <div class="g-def"><p>A small built-in spreadsheet-like table workflows use to remember state — e.g. which IPs are already blocked.</p><p class="tech">A first-class n8n entity queried/written by the <code>n8n-nodes-base.dataTable</code> node; not manageable via the CLI used this session.</p></div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Known gaps</h2>
+  <p class="section-sub">Not errors — deliberately left unfinished, and why.</p>
+  <ul class="gaps">
+    <li><span><strong>Grafana annotation step</strong> — needs a Grafana API key (header-auth credential); not configured, since no Grafana login was provided.</span></li>
+    <li><span><strong>Email notification step</strong> — needs SMTP credentials; not configured, since none were provided. The workflow runs fine up to this point regardless.</span></li>
+    <li><span><strong><code>blocked_ip_log</code> Data Table</strong> — existence unverified; n8n's CLI doesn't expose Data Tables, and checking requires the web UI.</span></li>
+    <li><span><strong>Auto-Block workflow is inactive on purpose</strong> — the 5-minute schedule trigger hasn't been turned on. It won't run automatically until activated in the n8n UI.</span></li>
+  </ul>
+
+  <footer>
+    Autonomous SOC project · troubleshooting log for the live-deployment session · twin copy kept at <code>AUTONOMOUS _SOC/Troubleshooting_Log.md</code> for version control.
+  </footer>
+
+</div>
+
+</body></html>

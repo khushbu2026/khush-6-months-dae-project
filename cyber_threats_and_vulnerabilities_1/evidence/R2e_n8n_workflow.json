@@ -1,0 +1,237 @@
+{
+  "name": "SOC - UC-01 Wazuh Brute-Force Detection & Automated Response",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## UC-01 — RDP Brute-Force Detection & Response\n\n**Trigger:** Wazuh Rule 100100 (5+ Event ID 4625 in 60s from same source IP) fires and POSTs a webhook to this workflow.\n\n**Flow:** Webhook → Parse → Severity check → Whitelist check → Log → Block (simulated) → Grafana annotation → Notify SOC operator.\n\nMatches Rubric 2e — Security Monitoring & Incident Response.",
+        "height": 260,
+        "width": 380
+      },
+      "id": "sticky_overview",
+      "name": "UC-01 Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-40, -360]
+    },
+    {
+      "parameters": {
+        "content": "### Wazuh Alert Level Legend\n1–4  Informational — log only\n5–7  Low — flag for review\n8–9  Medium — log + notify\n**10–12 HIGH — auto-block (this workflow)**\n13–15 CRITICAL — isolate + escalate",
+        "height": 200,
+        "width": 300
+      },
+      "id": "sticky_levels",
+      "name": "Alert Level Legend",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [480, -320]
+    },
+    {
+      "parameters": {
+        "content": "### Semester 2 TODO\n- Replace 'Simulate IP Block' echo command with a real pfctl/iptables rule on the honeypot host.\n- Add real SMTP or Slack credentials to 'Notify SOC Operator'.\n- Point Grafana annotation URL + auth at your live Grafana instance.",
+        "height": 220,
+        "width": 320
+      },
+      "id": "sticky_todo",
+      "name": "Semester 2 TODO",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1180, 540]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wazuh-alert",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "node_webhook",
+      "name": "Wazuh Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "wazuh-alert"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Step 2 — Parse & validate the Wazuh webhook payload\n// Expected payload from Wazuh active-response/integration:\n// { rule_id, level, source_ip, attempts, timestamp, description }\nconst body = $input.first().json.body || $input.first().json;\n\nconst alert = {\n  rule_id: body.rule_id || 'unknown',\n  level: Number(body.level) || 0,\n  source_ip: body.source_ip || body.srcip || 'unknown',\n  attempts: body.attempts || body.event_count || null,\n  timestamp: body.timestamp || new Date().toISOString(),\n  description: body.description || 'Brute-force correlation rule fired',\n  mitre: body.mitre || ['T1110', 'T1021.001']\n};\n\nreturn [{ json: alert }];"
+      },
+      "id": "node_parse",
+      "name": "Parse & Validate Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond_level",
+              "leftValue": "={{$json.level}}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node_if_level",
+      "name": "Level >= 10 (HIGH+)?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {},
+      "id": "node_noop_below_threshold",
+      "name": "Log Only - Below Threshold",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [720, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Step 3 — Check source IP against whitelist (localhost, UTM gateway IPs)\n// Edit this list to match your own UTM / lab network.\nconst whitelist = [\n  '127.0.0.1',\n  '192.168.64.1',\n  '192.168.64.2'\n];\n\nconst item = $input.first().json;\nitem.isWhitelisted = whitelist.includes(item.source_ip);\n\nreturn [{ json: item }];"
+      },
+      "id": "node_check_whitelist",
+      "name": "Check Whitelist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond_whitelist",
+              "leftValue": "={{$json.isWhitelisted}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node_if_whitelisted",
+      "name": "IP Whitelisted?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 200]
+    },
+    {
+      "parameters": {},
+      "id": "node_noop_false_positive",
+      "name": "False Positive - Whitelisted",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1200, 60]
+    },
+    {
+      "parameters": {
+        "command": "=echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] BRUTE_FORCE | Rule {{$json.rule_id}} | Level {{$json.level}} | IP {{$json.source_ip}} | Attempts {{$json.attempts}}\" >> ~/soc_stack/logs/soc_alerts.log"
+      },
+      "id": "node_log_file",
+      "name": "Log Alert to File",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "command": "=echo \"[SIMULATED BLOCK] $(date -u +%Y-%m-%dT%H:%M:%SZ) - Would DROP all inbound traffic from {{$json.source_ip}} on port 3389 (RDP). Semester 2: replace with real pfctl/iptables rule.\" >> ~/soc_stack/logs/ip_block_log.txt"
+      },
+      "id": "node_simulate_block",
+      "name": "Simulate IP Block",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/annotations",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"Brute-force detected: {{$json.source_ip}} ({{$json.attempts}} attempts) - Rule {{$json.rule_id}}\",\n  \"tags\": [\"brute-force\", \"wazuh\", \"rule-100100\"],\n  \"time\": {{Date.now()}}\n}",
+        "options": {}
+      },
+      "id": "node_grafana",
+      "name": "Post Grafana Annotation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "soc-alerts@yourdomain.local",
+        "toEmail": "soc-operator@yourdomain.local",
+        "subject": "=[SOC ALERT] Brute-Force Detected - {{$json.source_ip}}",
+        "text": "=Rule: {{$json.rule_id}}\nLevel: {{$json.level}}\nSource IP: {{$json.source_ip}}\nAttempts: {{$json.attempts}}\nTimestamp: {{$json.timestamp}}\n\nAutomated response: alert logged, IP block simulated, Grafana annotated.\nReview and confirm containment.",
+        "options": {}
+      },
+      "id": "node_notify",
+      "name": "Notify SOC Operator",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1920, 300],
+      "notes": "Swap for a Slack node if you'd rather notify via Slack. Needs SMTP (or Slack) credentials added in n8n before this node will run."
+    }
+  ],
+  "connections": {
+    "Wazuh Alert Webhook": {
+      "main": [[{ "node": "Parse & Validate Alert", "type": "main", "index": 0 }]]
+    },
+    "Parse & Validate Alert": {
+      "main": [[{ "node": "Level >= 10 (HIGH+)?", "type": "main", "index": 0 }]]
+    },
+    "Level >= 10 (HIGH+)?": {
+      "main": [
+        [{ "node": "Check Whitelist", "type": "main", "index": 0 }],
+        [{ "node": "Log Only - Below Threshold", "type": "main", "index": 0 }]
+      ]
+    },
+    "Check Whitelist": {
+      "main": [[{ "node": "IP Whitelisted?", "type": "main", "index": 0 }]]
+    },
+    "IP Whitelisted?": {
+      "main": [
+        [{ "node": "False Positive - Whitelisted", "type": "main", "index": 0 }],
+        [{ "node": "Log Alert to File", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Alert to File": {
+      "main": [[{ "node": "Simulate IP Block", "type": "main", "index": 0 }]]
+    },
+    "Simulate IP Block": {
+      "main": [[{ "node": "Post Grafana Annotation", "type": "main", "index": 0 }]]
+    },
+    "Post Grafana Annotation": {
+      "main": [[{ "node": "Notify SOC Operator", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
