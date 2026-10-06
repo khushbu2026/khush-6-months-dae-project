@@ -1,0 +1,99 @@
+{
+    "took": 25,
+    "timed_out": false,
+    "_shards": {
+        "total": 138,
+        "successful": 138,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 2,
+            "relation": "eq"
+        },
+        "max_score": null,
+        "hits": [
+            {
+                "_index": "wazuh-alerts-4.x-2026.10.06",
+                "_id": "tPA7EqEBgmKuZ0IMOVk1",
+                "_score": null,
+                "_source": {
+                    "agent": {
+                        "ip": "10.11.1.0",
+                        "name": "WIN-KU9NOAE1FE4",
+                        "id": "001"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "srcip": "10.11.2.97",
+                        "origin": {
+                            "module": "wazuh-execd",
+                            "name": "null"
+                        },
+                        "version": "1",
+                        "parameters": {
+                            "alert": {
+                                "data": {
+                                    "srcip": "10.11.2.97"
+                                }
+                            },
+                            "extra_args": [
+                                "10.11.2.97"
+                            ],
+                            "program": "active-response/bin/route-null.exe"
+                        },
+                        "command": "add"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "11.4"
+                        ],
+                        "tsc": [
+                            "CC6.1",
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3",
+                            "CC7.4"
+                        ],
+                        "description": "Host Blocked by route-null Active Response",
+                        "groups": [
+                            "ossec",
+                            "active_response"
+                        ],
+                        "id": "655",
+                        "nist_800_53": [
+                            "SI.4"
+                        ],
+                        "gpg13": [
+                            "4.13"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "parent": "ar_log_json",
+                        "name": "ar_log_json"
+                    },
+                    "full_log": "2026/10/06 10:20:23 active-response/bin/route-null.exe: {\"version\":1,\"origin\":{\"name\":null,\"module\":\"wazuh-execd\"},\"command\":\"add\",\"parameters\":{\"extra_args\":[\"10.11.2.97\"],\"alert\":{\"data\":{\"srcip\":\"10.11.2.97\"}},\"program\":\"active-response/bin/route-null.exe\"}}",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-10-06T17:20:25.326Z",
+                    "location": "active-response\\active-responses.log",
+                    "id": "1791307225.692673",
+                    "timestamp": "2026-10-06T17:20:25.326+0000"
+                },
+                "sort": [
+                    1791307225326
+                ]
+            }
+        ]
+    }
+}

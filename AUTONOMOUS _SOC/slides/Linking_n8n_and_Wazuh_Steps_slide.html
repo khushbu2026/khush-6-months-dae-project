@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How n8n and Wazuh Are Linked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{ margin:0; padding:0; background:#3a3630; }
+  .stage{ width:1920px; height:1080px; margin:0 auto; overflow:hidden; }
+  .icon{ display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .icon svg{ display:block; }
+  * { box-sizing:border-box; font-family:'IBM Plex Sans', Arial, sans-serif; }
+  .mono{ font-family:'IBM Plex Mono','Courier New',monospace; }
+  .badge{ flex:none; width:44px; height:44px; border-radius:50%; background:#B5652B; display:flex; align-items:center; justify-content:center; }
+  .badge p{ margin:0; font-size:24px; font-weight:700; color:#FFFFFF; line-height:1; }
+  .card{ background:#FFFFFF; border:1px solid #D8D3C6; border-radius:18px; padding:22px; display:flex; flex-direction:column; gap:12px; }
+  .card h3{ margin:0; font-size:27px; font-weight:600; color:#1C2430; }
+  .card p.desc{ margin:0; font-size:23px; line-height:1.32; color:#5B6472; }
+  .top{ display:flex; flex-direction:row; align-items:center; gap:12px; }
+</style>
+</head>
+<body>
+<div class="stage">
+<section style="width:1920px;height:1080px;background:#F5F3EE;color:#1C2430;padding:76px 128px;display:flex;flex-direction:column;gap:24px">
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="mono" style="font-size:23px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#7A4013;margin:0">Autonomous Cloud SOC &middot; Setup Walkthrough</p>
+    <h1 style="font-size:58px;font-weight:600;line-height:1.1;color:#1C2430;margin:0">How n8n and Wazuh Are Linked</h1>
+    <p style="font-size:26px;line-height:1.35;font-weight:400;color:#5B6472;margin:0">Five steps connect Wazuh's alerts to n8n's automated response — from the network bridge to a tested, working block.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+    <div class="card">
+      <div class="top">
+        <div class="badge"><p>1</p></div>
+        <span class="icon" style="color:#B5652B;width:30px;height:30px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <h3>Bridge the Containers</h3>
+      </div>
+      <p class="desc">n8n and Wazuh run in separate Docker containers, so the connection uses <b>host.docker.internal</b> instead of localhost.</p>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="badge"><p>2</p></div>
+        <span class="icon" style="color:#B5652B;width:30px;height:30px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </span>
+        <h3>Sign In to Wazuh</h3>
+      </div>
+      <p class="desc">Two separate logins are needed: the Indexer API (port 9200) for reading alerts, and the Manager API (port 55000) for taking action.</p>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="badge"><p>3</p></div>
+        <span class="icon" style="color:#B5652B;width:30px;height:30px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <h3>Save Credentials in n8n</h3>
+      </div>
+      <p class="desc">Both logins are stored as secure, reusable credentials inside n8n — entered once, then used wherever they're needed.</p>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="badge"><p>4</p></div>
+        <span class="icon" style="color:#B5652B;width:30px;height:30px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
+        <h3>Wire Credentials to the Workflow</h3>
+      </div>
+      <p class="desc">Each step in the n8n workflow is connected to the right credential: one to read Wazuh's alerts, one to send a response back.</p>
+    </div>
+
+    <div class="card" style="grid-column:span 2;background:#DCE9E1;border:1px solid #3E6B52;">
+      <div class="top">
+        <div class="badge" style="background:#3E6B52;"><p>5</p></div>
+        <span class="icon" style="color:#3E6B52;width:30px;height:30px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </span>
+        <h3>Test Before Going Live</h3>
+      </div>
+      <p class="desc">A trial run confirms n8n can read a real Wazuh alert and trigger an actual block — proven safe before the workflow runs unattended.</p>
+    </div>
+
+  </div>
+
+</section>
+</div>
+</body>
+</html>

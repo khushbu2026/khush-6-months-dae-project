@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linking n8n and Wazuh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{ margin:0; padding:0; background:#3a3630; }
+  .stage{ width:1920px; height:1080px; margin:0 auto; overflow:hidden; }
+  .icon{ display:inline-flex; align-items:center; justify-content:center; }
+  .icon svg{ display:block; }
+  * { box-sizing:border-box; font-family:'IBM Plex Sans', Arial, sans-serif; }
+  .mono{ font-family:'IBM Plex Mono','Courier New',monospace; }
+</style>
+</head>
+<body>
+<div class="stage">
+<section style="width:1920px;height:1080px;background:#F5F3EE;color:#1C2430;padding:84px 128px;display:flex;flex-direction:column;gap:26px">
+
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="mono" style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#7A4013;margin:0">Autonomous Cloud SOC</p>
+    <h1 style="font-size:62px;font-weight:600;line-height:1.1;color:#1C2430;margin:0">Linking n8n and Wazuh</h1>
+    <p style="font-size:28px;line-height:1.35;font-weight:400;color:#5B6472;margin:0">Two tools, talking to each other automatically: Wazuh watches the honeypot, n8n decides what to do, and calls back to block the attacker.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:18px">
+
+    <div style="display:flex;flex-direction:column;gap:14px;width:330px;background:#FFFFFF;border:1px solid #D8D3C6;border-radius:20px;padding:26px">
+      <span class="icon" style="color:#A13A2E;width:40px;height:40px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </span>
+      <h3 style="font-size:29px;font-weight:600;color:#1C2430;margin:0">Windows Honeypot</h3>
+      <p style="font-size:24px;line-height:1.3;color:#5B6472;margin:0">Attacker tries repeated logins (RDP brute-force)</p>
+    </div>
+
+    <span style="display:inline-block;width:52px;height:26px;background:#B5652B;clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+
+    <div style="display:flex;flex-direction:column;gap:14px;width:330px;background:#FFFFFF;border:1px solid #D8D3C6;border-radius:20px;padding:26px">
+      <span class="icon" style="color:#2F5D8A;width:40px;height:40px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      </span>
+      <h3 style="font-size:29px;font-weight:600;color:#1C2430;margin:0">Wazuh</h3>
+      <p style="font-size:24px;line-height:1.3;color:#5B6472;margin:0">Watches the logs and raises an alert</p>
+    </div>
+
+    <span style="display:inline-block;width:52px;height:26px;background:#B5652B;clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+
+    <div style="display:flex;flex-direction:column;gap:14px;width:330px;background:#FFFFFF;border:2px solid #B5652B;border-radius:20px;padding:26px">
+      <span class="icon" style="color:#B5652B;width:40px;height:40px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </span>
+      <h3 style="font-size:29px;font-weight:600;color:#1C2430;margin:0">n8n</h3>
+      <p style="font-size:24px;line-height:1.3;color:#5B6472;margin:0">Reads the alert, decides, and acts</p>
+    </div>
+
+    <span style="display:inline-block;width:52px;height:26px;background:#B5652B;clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+
+    <div style="display:flex;flex-direction:column;gap:14px;width:330px;background:#DCE9E1;border:1px solid #3E6B52;border-radius:20px;padding:26px">
+      <span class="icon" style="color:#3E6B52;width:40px;height:40px">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </span>
+      <h3 style="font-size:29px;font-weight:600;color:#1C2430;margin:0">Blocked &amp; Logged</h3>
+      <p style="font-size:24px;line-height:1.3;color:#5B6472;margin:0">IP blocked, incident recorded automatically</p>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;background:#F2DCC3;border-radius:14px;padding:16px 28px">
+    <span class="icon" style="color:#7A4013;width:28px;height:28px">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    </span>
+    <p class="mono" style="font-size:23px;font-weight:500;color:#7A4013;margin:0">n8n and Wazuh run in separate Docker containers, so they talk over host.docker.internal — never "localhost"</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;gap:22px">
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFFFF;border:1px solid #D8D3C6;border-radius:16px;padding:24px">
+      <span class="icon" style="color:#B5652B;width:32px;height:32px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      </span>
+      <h3 style="font-size:25px;font-weight:600;color:#1C2430;margin:0">Two logins, one workflow</h3>
+      <p style="font-size:24px;line-height:1.35;color:#5B6472;margin:0">n8n stores a Wazuh Indexer login (port 9200, for reading alerts) and a Wazuh Manager login (port 55000, for taking action).</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFFFF;border:1px solid #D8D3C6;border-radius:16px;padding:24px">
+      <span class="icon" style="color:#B5652B;width:32px;height:32px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </span>
+      <h3 style="font-size:25px;font-weight:600;color:#1C2430;margin:0">Real action, not just a message</h3>
+      <p style="font-size:24px;line-height:1.35;color:#5B6472;margin:0">n8n calls Wazuh's Active Response API directly — it tells Wazuh to block the IP, it doesn't just notify someone.</p>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#FFFFFF;border:1px solid #D8D3C6;border-radius:16px;padding:24px">
+      <span class="icon" style="color:#B5652B;width:32px;height:32px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </span>
+      <h3 style="font-size:25px;font-weight:600;color:#1C2430;margin:0">Seconds, not minutes</h3>
+      <p style="font-size:24px;line-height:1.35;color:#5B6472;margin:0">Detection to blocked IP happens automatically — no analyst has to click anything.</p>
+    </div>
+  </div>
+
+</section>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+    "data": [
+        {
+            "sourceIp": "10.11.2.97",
+            "ruleId": "100100",
+            "ruleDescription": "Multiple Windows logon failures from the same source IP - possible RDP brute-force attack",
+            "level": 10,
+            "agentId": "001",
+            "agentName": "WIN-KU9NOAE1FE4",
+            "blockedAt": "2026-10-06T17:20:23.305Z",
+            "eventId": "rvA6EqEBgmKuZ0IMsFl_",
+            "id": 1,
+            "createdAt": "2026-10-06T17:20:23.310Z",
+            "updatedAt": "2026-10-06T17:20:23.310Z"
+        }
+    ],
+    "nextCursor": null
+}

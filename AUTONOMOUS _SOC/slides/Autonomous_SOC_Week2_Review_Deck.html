@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autonomous Cloud SOC — Week 2 Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F6F8; --surface:#FFFFFF; --surface-2:#E7EEF2;
+    --ink:#142433; --ink-dim:#55697A; --line:#D2DEE6;
+    --accent:#1C7293; --accent-ink:#0F4C5C; --accent-soft:#D9ECF2;
+    --ok:#2E8B57; --ok-soft:#DFF3E7;
+    --warn:#C98A1F; --warn-soft:#FBEBD1;
+    --crit:#C24B41; --crit-soft:#F7DEDB;
+  }
+  html,body{ margin:0; padding:0; background:#20272c; }
+  * { box-sizing:border-box; font-family:'Inter', Arial, sans-serif; }
+  .mono{ font-family:'JetBrains Mono','Courier New',monospace; }
+  .disp{ font-family:'Space Grotesk', Arial, sans-serif; }
+  .slide{
+    width:1920px; height:1080px; margin:0 auto; background:var(--bg); color:var(--ink);
+    position:relative; overflow:hidden; page-break-after:always;
+  }
+  .icon{ display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .icon svg{ display:block; }
+  .eyebrow{ font-family:'JetBrains Mono','Courier New',monospace; font-size:20px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:var(--accent-ink); margin:0; }
+  .badge{ flex:none; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; }
+  .badge p{ margin:0; font-weight:700; color:#FFFFFF; line-height:1; }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; }
+  .footer{ position:absolute; left:112px; bottom:40px; right:112px; display:flex; flex-direction:row; justify-content:space-between; align-items:center; }
+  .footer p{ margin:0; font-family:'JetBrains Mono','Courier New',monospace; font-size:16px; color:var(--ink-dim); }
+</style>
+</head>
+<body>
+
+<!-- ============ SLIDE 1 — COVER ============ -->
+<section class="slide" style="background:linear-gradient(135deg,#0F4C5C 0%,#1C7293 60%,#2A8FB0 100%);color:#FFFFFF;padding:120px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+  <p class="mono" style="font-size:22px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#BFE3EC;margin:0">DAE Cybersecurity Program &middot; Capstone</p>
+  <h1 class="disp" style="font-size:96px;font-weight:700;line-height:1.05;margin:0;color:#FFFFFF">Autonomous Cloud SOC</h1>
+  <p style="font-size:34px;font-weight:400;color:#E4F3F7;margin:0">Security Operations Center &mdash; Week in Review</p>
+
+  <div style="display:flex;flex-direction:row;gap:24px;margin-top:20px">
+    <div style="flex:1;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.28);border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+      <span class="icon" style="color:#BFE3EC;width:30px;height:30px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+      <p class="mono" style="font-size:18px;color:#BFE3EC;margin:0;text-transform:uppercase;letter-spacing:1px">Pipeline Status</p>
+      <p class="disp" style="font-size:44px;font-weight:700;color:#FFFFFF;margin:0">ACTIVE</p>
+    </div>
+    <div style="flex:1;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.28);border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+      <span class="icon" style="color:#BFE3EC;width:30px;height:30px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      <p class="mono" style="font-size:18px;color:#BFE3EC;margin:0;text-transform:uppercase;letter-spacing:1px">Test Executions</p>
+      <p class="disp" style="font-size:44px;font-weight:700;color:#FFFFFF;margin:0">5 / 5 successful</p>
+    </div>
+    <div style="flex:1;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.28);border-radius:18px;padding:28px 32px;display:flex;flex-direction:column;gap:10px">
+      <span class="icon" style="color:#BFE3EC;width:30px;height:30px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+      <p class="mono" style="font-size:18px;color:#BFE3EC;margin:0;text-transform:uppercase;letter-spacing:1px">Response Time</p>
+      <p class="disp" style="font-size:44px;font-weight:700;color:#FFFFFF;margin:0">Under 30 seconds</p>
+    </div>
+  </div>
+
+  <p class="mono" style="position:absolute;left:120px;bottom:64px;font-size:18px;color:#BFE3EC;margin:0">Khushbu Jalan &middot; September 2026</p>
+</section>
+
+<!-- ============ SLIDE 2 — HOW THE SYSTEM WORKS ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:30px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Autonomous Cloud SOC &middot; Pipeline Overview</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">How the System Works</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">Five stages, fully automated: an attack is detected and blocked with no person in the loop.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;margin-top:10px">
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;width:300px;padding:24px">
+      <span class="icon" style="color:var(--crit);width:34px;height:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span>
+      <h3 class="disp" style="font-size:25px;font-weight:600;color:var(--ink);margin:0">Kali Linux</h3>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Hydra fires repeated RDP password guesses</p>
+    </div>
+    <span style="display:inline-block;width:44px;height:22px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;width:300px;padding:24px">
+      <span class="icon" style="color:var(--warn);width:34px;height:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+      <h3 class="disp" style="font-size:25px;font-weight:600;color:var(--ink);margin:0">Windows Honeypot</h3>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Logs every failed login as it happens</p>
+    </div>
+    <span style="display:inline-block;width:44px;height:22px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;width:300px;padding:24px">
+      <span class="icon" style="color:var(--accent);width:34px;height:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
+      <h3 class="disp" style="font-size:25px;font-weight:600;color:var(--ink);margin:0">Wazuh</h3>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Rule 100001 fires a Level 10 alert at 5+ failures</p>
+    </div>
+    <span style="display:inline-block;width:44px;height:22px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;width:300px;padding:24px;border:2px solid var(--accent)">
+      <span class="icon" style="color:var(--accent);width:34px;height:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+      <h3 class="disp" style="font-size:25px;font-weight:600;color:var(--ink);margin:0">n8n</h3>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Reads the alert and triggers Active Response</p>
+    </div>
+    <span style="display:inline-block;width:44px;height:22px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;width:300px;padding:24px;background:var(--ok-soft);border:1px solid var(--ok)">
+      <span class="icon" style="color:var(--ok);width:34px;height:34px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      <h3 class="disp" style="font-size:25px;font-weight:600;color:var(--ink);margin:0">Grafana</h3>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Records the block on the incident timeline</p>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;background:var(--accent-soft);border-radius:14px;padding:18px 28px;margin-top:6px">
+    <p class="mono" style="font-size:22px;font-weight:500;color:var(--accent-ink);margin:0">All five stages run automatically, end to end, in under 30 seconds &mdash; no human needed.</p>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>02 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 3 — WHAT WAS ACCOMPLISHED ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:30px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Autonomous Cloud SOC &middot; Weekly Progress</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">What Was Accomplished This Week</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">Three milestones, each verified with live evidence &mdash; not just claimed.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;gap:24px;margin-top:10px">
+    <div class="card" style="flex:1;display:flex;flex-direction:column;gap:16px;padding:32px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:48px;height:48px"><span class="icon" style="color:#fff;width:24px;height:24px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span></div>
+        <h3 class="disp" style="font-size:27px;font-weight:600;color:var(--ink);margin:0">Honeypot Connected</h3>
+      </div>
+      <p style="font-size:22px;line-height:1.4;color:var(--ink-dim);margin:0">Wazuh Agent v4.7.0 installed on the Windows 11 Pro VM (WIN&#8209;KU9NOAE1FE4) &mdash; real log events confirmed streaming in.</p>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;gap:16px;padding:32px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:48px;height:48px;background:var(--ok)"><span class="icon" style="color:#fff;width:24px;height:24px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div>
+        <h3 class="disp" style="font-size:27px;font-weight:600;color:var(--ink);margin:0">Auto-Block Workflow Verified</h3>
+      </div>
+      <p style="font-size:22px;line-height:1.4;color:var(--ink-dim);margin:0">Detection rule deployed (5+ failed RDP logins triggers it). 5 successful test runs, each under the 30-second target, across 24 hours.</p>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;gap:16px;padding:32px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:48px;height:48px;background:var(--accent-ink)"><span class="icon" style="color:#fff;width:24px;height:24px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></div>
+        <h3 class="disp" style="font-size:27px;font-weight:600;color:var(--ink);margin:0">Full Pipeline Connected</h3>
+      </div>
+      <p style="font-size:22px;line-height:1.4;color:var(--ink-dim);margin:0">Wazuh, n8n and Grafana now operate as one continuous pipeline, with every stage evidenced end to end.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>03 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 4 — EVIDENCE: HONEYPOT AGENT ACTIVE ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:30px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Evidence &middot; 01</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">Windows Honeypot: Agent Active</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">The Wazuh dashboard confirms the honeypot is enrolled and streaming live.</p>
+  </div>
+
+  <div class="card" style="margin-top:10px;padding:48px;display:flex;flex-direction:row;align-items:center;gap:48px;background:var(--ok-soft);border:1px solid var(--ok)">
+    <span class="icon" style="color:var(--ok);width:96px;height:96px"><svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+    <div style="display:flex;flex-direction:column;gap:18px;flex:1">
+      <div style="display:flex;flex-direction:row;gap:56px">
+        <div>
+          <p class="mono" style="font-size:18px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:1px;margin:0 0 6px">Agent</p>
+          <p class="disp" style="font-size:30px;font-weight:600;color:var(--ink);margin:0">WIN-KU9NOAE1FE4</p>
+        </div>
+        <div>
+          <p class="mono" style="font-size:18px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:1px;margin:0 0 6px">Status</p>
+          <p class="disp" style="font-size:30px;font-weight:600;color:var(--ok);margin:0">Active</p>
+        </div>
+        <div>
+          <p class="mono" style="font-size:18px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:1px;margin:0 0 6px">Version</p>
+          <p class="disp" style="font-size:30px;font-weight:600;color:var(--ink);margin:0">Wazuh Agent v4.7.0</p>
+        </div>
+      </div>
+      <p style="font-size:22px;line-height:1.4;color:var(--ink);margin:0">Enrolled, active, and streaming real log events live from the honeypot into Wazuh &mdash; confirmed directly on the dashboard, not assumed.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>04 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 5 — EVIDENCE: N8N AUTO-BLOCK WORKFLOW ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:30px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Evidence &middot; 02</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">The n8n Auto-Block Workflow</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">Wazuh alert in, firewall block out &mdash; no human action needed.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:stretch;justify-content:center;gap:14px;margin-top:16px">
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center">
+      <span class="icon" style="color:var(--accent);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Trigger</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">Every 5 minutes</p>
+    </div>
+    <span style="align-self:center;display:inline-block;width:28px;height:14px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center">
+      <span class="icon" style="color:var(--accent);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Query Wazuh</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">High-severity alerts</p>
+    </div>
+    <span style="align-self:center;display:inline-block;width:28px;height:14px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center">
+      <span class="icon" style="color:var(--accent);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Extract Source IP</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">Skip already-blocked IPs</p>
+    </div>
+    <span style="align-self:center;display:inline-block;width:28px;height:14px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center">
+      <span class="icon" style="color:var(--accent);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Authenticate</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">Wazuh Manager API</p>
+    </div>
+    <span style="align-self:center;display:inline-block;width:28px;height:14px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center;border:2px solid var(--crit)">
+      <span class="icon" style="color:var(--crit);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Active Response</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">Block the IP</p>
+    </div>
+    <span style="align-self:center;display:inline-block;width:28px;height:14px;background:var(--accent);clip-path:polygon(0% 25%, 60% 25%, 60% 0%, 100% 50%, 60% 100%, 60% 75%, 0% 75%);"></span>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;text-align:center;background:var(--ok-soft);border:1px solid var(--ok)">
+      <span class="icon" style="color:var(--ok);width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      <p style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Log to Grafana</p>
+      <p style="font-size:16px;color:var(--ink-dim);margin:0">Recorded on the timeline</p>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;background:var(--accent-soft);border-radius:14px;padding:16px 28px;margin-top:10px">
+    <p class="mono" style="font-size:21px;font-weight:500;color:var(--accent-ink);margin:0">End-to-end automation pipeline &mdash; Wazuh alert in, firewall block out, no human action needed.</p>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>05 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 6 — LINKING N8N AND WAZUH (NEW) ============ -->
+<section class="slide" style="padding:70px 112px;display:flex;flex-direction:column;gap:22px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Autonomous Cloud SOC &middot; Setup Walkthrough</p>
+    <h1 class="disp" style="font-size:50px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">How n8n and Wazuh Are Linked</h1>
+    <p style="font-size:23px;line-height:1.35;color:var(--ink-dim);margin:0">Five steps connect Wazuh's alerts to n8n's automated response &mdash; from the network bridge to a tested, working block.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:38px;height:38px"><p style="font-size:19px">1</p></div>
+        <span class="icon" style="color:var(--accent);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+        <h3 class="disp" style="font-size:23px;font-weight:600;color:var(--ink);margin:0">Bridge the Containers</h3>
+      </div>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">n8n and Wazuh run in separate Docker containers, so the connection uses <b>host.docker.internal</b> instead of localhost.</p>
+    </div>
+    <div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:38px;height:38px"><p style="font-size:19px">2</p></div>
+        <span class="icon" style="color:var(--accent);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        <h3 class="disp" style="font-size:23px;font-weight:600;color:var(--ink);margin:0">Sign In to Wazuh</h3>
+      </div>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Two separate logins: the Indexer API (port 9200) for reading alerts, and the Manager API (port 55000) for taking action.</p>
+    </div>
+    <div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:38px;height:38px"><p style="font-size:19px">3</p></div>
+        <span class="icon" style="color:var(--accent);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <h3 class="disp" style="font-size:23px;font-weight:600;color:var(--ink);margin:0">Save Credentials in n8n</h3>
+      </div>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Both logins are stored as secure, reusable credentials inside n8n &mdash; entered once, used everywhere they're needed.</p>
+    </div>
+    <div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:38px;height:38px"><p style="font-size:19px">4</p></div>
+        <span class="icon" style="color:var(--accent);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <h3 class="disp" style="font-size:23px;font-weight:600;color:var(--ink);margin:0">Wire Credentials to the Workflow</h3>
+      </div>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">Each workflow step uses the right credential: one to read Wazuh's alerts, one to send a response back.</p>
+    </div>
+    <div class="card" style="grid-column:span 2;padding:20px 22px;display:flex;flex-direction:column;gap:10px;background:var(--ok-soft);border:1px solid var(--ok)">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <div class="badge" style="width:38px;height:38px;background:var(--ok)"><p style="font-size:19px">5</p></div>
+        <span class="icon" style="color:var(--ok);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+        <h3 class="disp" style="font-size:23px;font-weight:600;color:var(--ink);margin:0">Test Before Going Live</h3>
+      </div>
+      <p style="font-size:20px;line-height:1.3;color:var(--ink-dim);margin:0">A trial run confirms n8n can read a real Wazuh alert and trigger an actual block &mdash; proven safe before the workflow runs unattended.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>06 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 7 — WIRING N8N TO GRAFANA (NEW) ============ -->
+<section class="slide" style="padding:62px 108px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <p class="eyebrow">Autonomous Cloud SOC &middot; Grafana Integration</p>
+    <h1 class="disp" style="font-size:46px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">Wiring n8n to Grafana</h1>
+    <p style="font-size:21px;line-height:1.3;color:var(--ink-dim);margin:0">Nine steps to get n8n's blocked-IP alerts safely recorded into Grafana.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">1</p></div>
+        <span class="icon" style="color:var(--crit);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Default Login Rejected</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">admin/admin failed &mdash; this Grafana had a different password set.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">2</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Found the Real Password</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Read it from Grafana's own container configuration.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">3</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Created a Service Account</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">A non-human login for n8n, given only Editor access &mdash; not full Admin.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">4</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Generated an Access Token</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Issued once by Grafana, captured immediately &mdash; it can't be viewed again.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">5</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Tested the Token First</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Confirmed it could actually write to Grafana before trusting it anywhere.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">6</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Saved as an n8n Credential</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Stored securely so n8n sends it automatically with every request.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">7</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Linked to the Right Step</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Attached to the exact workflow node that posts results to Grafana.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px"><p style="font-size:17px">8</p></div>
+        <span class="icon" style="color:var(--accent);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Used the Correct Address</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:var(--ink-dim);margin:0">Pointed to host.docker.internal, since Grafana is its own separate container.</p>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:6px;background:var(--warn-soft);border:1px solid var(--warn)">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:9px">
+        <div class="badge" style="width:32px;height:32px;background:var(--warn)"><p style="font-size:17px">9</p></div>
+        <span class="icon" style="color:var(--warn);width:22px;height:22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <h3 style="font-size:19px;font-weight:600;color:var(--ink);margin:0">Dashboard Still to Come</h3>
+      </div>
+      <p style="font-size:18px;line-height:1.25;color:#8a5a12;margin:0">The link works end to end; next is building a Grafana dashboard to see it.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>07 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 8 — DEBUGGING THE PIPELINE ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:30px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Debugging the Pipeline</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">From Failure to Success</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">The before/after that tells the real story &mdash; not just the finished result.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;gap:24px;margin-top:10px">
+    <div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px;background:var(--crit-soft);border:1px solid var(--crit)">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <span class="icon" style="color:var(--crit);width:32px;height:32px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+        <h3 class="disp" style="font-size:30px;font-weight:700;color:#7A2A24;margin:0">BEFORE</h3>
+      </div>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0"><b>Root cause:</b> the workflow was calling the wrong address &mdash; localhost instead of host.docker.internal.</p>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0"><b>Also broken:</b> the Wazuh API authentication token was misconfigured.</p>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0">Result: repeated execution failures.</p>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;gap:18px;padding:32px;background:var(--ok-soft);border:1px solid var(--ok)">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:12px">
+        <span class="icon" style="color:var(--ok);width:32px;height:32px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+        <h3 class="disp" style="font-size:30px;font-weight:700;color:#1E5B3B;margin:0">AFTER</h3>
+      </div>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0"><b>Fix:</b> corrected the URL and reconfigured the authentication credentials.</p>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0"><b>Verified:</b> multiple executions completed successfully.</p>
+      <p style="font-size:23px;line-height:1.4;color:var(--ink);margin:0">Response time back under the 30-second target.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>08 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 9 — KEY CONCEPTS & KNOWN GAPS ============ -->
+<section class="slide" style="padding:76px 112px;display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <p class="eyebrow">Reference</p>
+    <h1 class="disp" style="font-size:54px;font-weight:700;line-height:1.1;color:var(--ink);margin:0">Key Concepts &amp; Known Gaps</h1>
+    <p style="font-size:25px;line-height:1.35;color:var(--ink-dim);margin:0">Terms used throughout this project, and an honest list of what's still unfinished.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:row;gap:28px;margin-top:6px">
+    <div class="card" style="flex:1;padding:30px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:10px">
+        <span class="icon" style="color:var(--accent);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+        <h3 class="disp" style="font-size:27px;font-weight:600;color:var(--ink);margin:0">Key Terms</h3>
+      </div>
+      <p style="font-size:21px;line-height:1.55;color:var(--ink-dim);margin:0"><b style="color:var(--ink)">Active Response</b> &mdash; Wazuh's built-in mechanism for taking an action, like blocking an IP.<br><b style="color:var(--ink)">Bearer Token</b> &mdash; a secret string sent with a request to prove it's authorized.<br><b style="color:var(--ink)">host.docker.internal</b> &mdash; the address one Docker container uses to reach another on the same machine.<br><b style="color:var(--ink)">Indexer vs. Manager API</b> &mdash; port 9200 searches stored alert data; port 55000 takes action.</p>
+    </div>
+    <div class="card" style="flex:1;padding:30px;display:flex;flex-direction:column;gap:16px;background:var(--warn-soft);border:1px solid var(--warn)">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:10px">
+        <span class="icon" style="color:var(--warn);width:26px;height:26px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <h3 class="disp" style="font-size:27px;font-weight:600;color:var(--ink);margin:0">Known Gaps</h3>
+      </div>
+      <p style="font-size:21px;line-height:1.55;color:#6B4A15;margin:0">&bull; The <b>blocked_ip_log</b> Data Table &mdash; existence not yet fully verified.<br>&bull; The 5-minute schedule trigger is intentionally left off until a full manual run succeeds.<br>&bull; The Grafana dashboard itself still needs to be built.<br>&bull; Email notification credentials are not yet configured.</p>
+    </div>
+  </div>
+
+  <div class="footer"><p>Autonomous Cloud SOC &middot; Week 2 Review</p><p>09 / 10</p></div>
+</section>
+
+<!-- ============ SLIDE 10 — THANK YOU / RESULTS SUMMARY ============ -->
+<section class="slide" style="background:linear-gradient(135deg,#0F4C5C 0%,#1C7293 60%,#2A8FB0 100%);color:#FFFFFF;padding:120px;display:flex;flex-direction:column;justify-content:center;gap:30px">
+  <span class="icon" style="color:#BFE3EC;width:56px;height:56px"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span>
+  <h1 class="disp" style="font-size:78px;font-weight:700;line-height:1.08;margin:0;color:#FFFFFF">Thank You</h1>
+  <p style="font-size:30px;font-weight:400;color:#E4F3F7;margin:0">Results Summary &mdash; Week 2</p>
+
+  <div class="card" style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.28);border-radius:18px;padding:32px 36px;margin-top:10px">
+    <p style="font-size:24px;line-height:1.5;color:#FFFFFF;margin:0">The pipeline was verified end to end this week: a real attack on the honeypot is detected by Wazuh, picked up by n8n, and automatically blocked &mdash; in under 30 seconds, with zero human intervention. All evidence has been captured and is ready for academic submission.</p>
+  </div>
+
+  <p class="mono" style="font-size:20px;color:#BFE3EC;margin-top:10px">Khushbu Jalan &middot; DAE Cybersecurity Program &middot; September 2026</p>
+  <p style="position:absolute;right:120px;bottom:64px;font-size:18px;color:#BFE3EC;margin:0">10 / 10</p>
+</section>
+
+</body>
+</html>

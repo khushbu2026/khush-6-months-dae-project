@@ -6,6 +6,38 @@
 
 ---
 
+## The process behind all of this (two versions)
+
+Before the specific errors, this is the repeating *method* used to find and fix every one of them — the same loop applies regardless of which tool broke. Given twice: once in plain, non-technical language, once with the real terms.
+
+### In simple terms — no jargon
+
+Think of it like setting up an automatic security guard for a building. **Wazuh** is the cameras and alarms that notice trouble. **n8n** is the guard who reacts. **Claude** is the manager giving the guard instructions. **Grafana** is the logbook where every action gets written down. **Email** is the guard calling to report what happened.
+
+1. **First, understand *why* two things aren't talking — before touching anything.** Two radios wouldn't connect. Instead of randomly pressing buttons, we figured out exactly why — one only accepted a special "secure" signal the other wasn't sending. Once that was clear, the fix became obvious.
+2. **Check what's already in the toolbox before buying new tools.** Before building a guard routine from scratch, we looked around and found someone had already left two half-built routines sitting there, unused. No point building new when something's already there.
+3. **Every fix is a guess until it actually works — read what went wrong, don't just try again blindly.** A few early attempts failed. Each time, we read the error message carefully, like reading the fine print on a broken appliance, instead of randomly retrying.
+4. **Test each key on its own door before handing over the whole keyring.** The guard needed keys to three different rooms. Before handing him the whole set, we tried each key ourselves, one at a time, to make sure each one opened its own door.
+5. **Don't just trust advice — check it against the real building.** Someone said "use this door instead." We checked the real floor plan first and found the advice was close, but pointed at slightly the wrong door.
+6. **Practice with a pretend troublemaker before the guard deals with a real one.** Before letting the guard actually lock someone out, we had him practice on a fake, harmless "test troublemaker" first, so we could watch the whole routine work without any real consequence.
+7. **Keep the guard on "manual" until you personally say "go."** Even though he's fully trained, we deliberately left him waiting for explicit permission. He won't act on his own until that switch is flipped.
+8. **If you spot a different danger while doing something else, stop and say something.** While working on the guard, we noticed something unrelated — a door to private files about to be left wide open — and stopped immediately to warn about it.
+9. **Write it all down as it happens, not from memory later.** Every time something broke and got fixed, it was written down right away, like a diary.
+
+### In technical terms
+
+1. **Understand the obstacle before reaching for a tool.** We identified *precisely* why Claude Desktop rejected n8n's address (the GUI connector specifically requires `https://`) before reaching for a fix — which is what let us later realize a tunnel wasn't even necessary.
+2. **Look for what already exists before building something new.** Before writing an integration from scratch, we inventoried what was already in the n8n instance and read the project's own evidence file, finding two already-designed workflows instead of reinventing them.
+3. **Treat every fix attempt as a hypothesis, not a solution, until confirmed.** Each failed attempt (the OAuth connector, the first config schema) was diagnosed by reading the actual error message closely, which is what pointed at the real fix each time.
+4. **Verify each credential/connection in isolation before wiring it into the bigger system.** Every login (Wazuh Indexer, Wazuh Manager API, Grafana, SMTP) was tested directly with `curl`/a small script *before* it ever became an n8n credential — separating "is the credential wrong" from "is n8n configured wrong."
+5. **Don't trust advice — even correct-sounding advice — without checking it against the real system.** Told to swap `firewall-drop` for `route-null`, we instead read the actual Wazuh config and found the deployment-specific truth (`win_route-null`) — the advice was directionally right, wrong in the specific detail.
+6. **Build a safe rehearsal before doing the real thing.** Since blocking an IP has a real effect, a manual trigger with a fake IP and a nonexistent agent ID was built first, so the full mechanism could run end to end with zero real-world consequence.
+7. **Keep anything automatic/destructive switched off until a human explicitly arms it.** The workflow stayed `active: false` throughout — wired and tested, never scheduled, by design.
+8. **Stay alert to unrelated risks encountered mid-task.** The `git add .` near-miss was caught while working on something else entirely, and flagged immediately rather than after finishing the original task.
+9. **Document as you go, not from memory afterward.** Each fix was recorded — what broke, why, how it was resolved — at the moment it happened.
+
+---
+
 ## 1. The core constraint — Claude Desktop needs HTTPS, n8n only gives HTTP
 
 n8n's MCP server address is `http://localhost:5678/mcp-server/http`. Claude Desktop's "Add custom connector" screen only accepts `https://` URLs.
@@ -147,8 +179,8 @@ Running `git status` revealed `/Users/Adult` itself is a git repository. A plain
 ## 10. Wrong Wazuh account used — 401 Unauthorized on the Manager API
 
 ```
-Indexer (port 9200) with admin/SecretPassword → works.
-Manager API (port 55000) with admin/SecretPassword →
+Indexer (port 9200) with admin/<redacted> → works.
+Manager API (port 55000) with admin/<redacted> →
 {"title":"Unauthorized","detail":"Invalid credentials"}
 ```
 
