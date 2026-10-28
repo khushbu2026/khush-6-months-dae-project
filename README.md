@@ -21,6 +21,18 @@ Early programming exercises and project work that helped me build confidence in 
 
 ## Explore my learning journey
 
+| Organized section | Open folder |
+| --- | --- |
+| Cybersecurity fundamentals | [Browse](01-cybersecurity-fundamentals/) |
+| Python and programming | [Browse](02-python-and-programming/) |
+| Linux and Git | [Browse](03-linux-and-git/) |
+| Network security and SOC | [Browse](04-network-security-and-soc/) |
+| Autonomous Cloud SOC | [Browse](05-autonomous-cloud-soc/) |
+| AI and automation | [Browse](06-ai-and-automation/) |
+| Professional development | [Browse](07-professional-development/) |
+| Learning journey | [Browse](08-learning-journey/) |
+
+
 | Area | What it covers |
 | --- | --- |
 | Cybersecurity foundations | Security concepts, threats, vulnerabilities, and defense |
